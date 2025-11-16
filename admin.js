@@ -1,9 +1,9 @@
 // admin.js
 
 const $ = id => document.getElementById(id);
-const API_BASE = "https://licensekey-cyan.vercel.app"; // kosong = origin yang sama (https://project.vercel.app)
+const API_BASE = ""; // kosong = origin yang sama (https://project.vercel.app)
 
-// ====== STORAGE ADMIN KEY ======
+// ====== ADMIN KEY STORAGE ======
 function getAdminKey() {
   return localStorage.getItem("geekz_admin_key") || "";
 }
@@ -28,7 +28,7 @@ async function apiFetch(path, options = {}) {
   return { status: res.status, data };
 }
 
-// ====== LOGIN LOGIC ======
+// ====== LOGIN ======
 async function tryLogin() {
   const pass = $("admin-pass").value.trim();
   if (!pass) {
@@ -37,10 +37,14 @@ async function tryLogin() {
   }
   setAdminKey(pass);
 
-  const { status, data } = await apiFetch("/api/admin/login", { method: "POST", body: {} });
+  const { status, data } = await apiFetch("/api/admin/login", {
+    method: "POST",
+    body: {}
+  });
 
   if (!data.ok || status !== 200) {
-    $("login-msg").textContent = "Login gagal: " + (data.message || "invalid password");
+    $("login-msg").textContent =
+      "Login gagal: " + (data.message || "invalid password");
     localStorage.removeItem("geekz_admin_key");
     return;
   }
@@ -52,7 +56,7 @@ async function tryLogin() {
   loadLicenses();
 }
 
-// ====== LICENSE LIST ======
+// ====== LIST LICENSE ======
 function renderLicenses(items) {
   const tbody = $("tbl-body");
   tbody.innerHTML = "";
@@ -76,10 +80,14 @@ function renderLicenses(items) {
       }</td>
       <td>
         <span class="small">Aktif: ${
-          it.firstActivated ? new Date(it.firstActivated).toLocaleString("id-ID") : "-"
+          it.firstActivated
+            ? new Date(it.firstActivated).toLocaleString("id-ID")
+            : "-"
         }</span><br>
         <span class="small">Last: ${
-          it.lastCheckin ? new Date(it.lastCheckin).toLocaleString("id-ID") : "-"
+          it.lastCheckin
+            ? new Date(it.lastCheckin).toLocaleString("id-ID")
+            : "-"
         }</span>
       </td>
     `;
@@ -87,7 +95,8 @@ function renderLicenses(items) {
       $("f-licenseKey").value = it.licenseKey;
       $("f-ownerEmail").value = it.ownerEmail || "";
       $("f-status").value = it.status || "unused";
-      $("admin-msg").textContent = "License dimuat ke form. Edit & klik Simpan.";
+      $("admin-msg").textContent =
+        "License dimuat ke form. Edit lalu klik Simpan / Update.";
     });
     tbody.appendChild(tr);
   });
@@ -97,8 +106,8 @@ async function loadLicenses() {
   $("admin-msg").textContent = "Memuat daftar license...";
   const { status, data } = await apiFetch("/api/admin/licenses-list");
   if (!data.ok || status !== 200) {
-    $("admin-msg")..textContent =
-      "Gagal load license: " + (data.message || "Unknown error");
+    $("admin-msg").textContent =
+      "Gagal load license: " + (data.message || "Unknown error";
     return;
   }
   $("admin-msg").textContent = "";
@@ -177,7 +186,7 @@ window.addEventListener("DOMContentLoaded", () => {
   $("btn-delete").addEventListener("click", deleteLicense);
   $("btn-clear").addEventListener("click", clearForm);
 
-  // jika admin key sudah tersimpan, coba langsung login silent
+  // kalau sudah pernah login, coba auto-login
   if (getAdminKey()) {
     tryLogin();
   }

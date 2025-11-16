@@ -1,22 +1,8 @@
-// dashboard/dashboard.js
+// dashboard.js
 
-const API_BASE = "https://licensekey-cyan.vercel.app/";
+const API_BASE = "https://licensekey-cyan.vercel.app/"; // kosong = origin yang sama
 
 const $ = id => document.getElementById(id);
-
-async function fetchInfo(licenseKey) {
-  const res = await fetch(`${API_BASE}/api/license/info?licenseKey=${encodeURIComponent(licenseKey)}`);
-  return res.json();
-}
-
-async function releaseDevice(licenseKey) {
-  const res = await fetch(`${API_BASE}/api/license/release`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ licenseKey })
-  });
-  return res.json();
-}
 
 function formatDate(d) {
   if (!d) return "-";
@@ -36,29 +22,38 @@ window.addEventListener("DOMContentLoaded", () => {
   const firstEl = $("lic-first");
   const lastEl = $("lic-last");
 
-  btnCheck.onclick = async () => {
+  function setMsg(text, type = "info") {
+    msg.textContent = text || "";
+    msg.style.color = type === "error" ? "#f97373" : "#9ca3af";
+  }
+
+  btnCheck.addEventListener("click", async () => {
     const key = input.value.trim();
     if (!key) {
-      msg.textContent = "Masukkan license key terlebih dahulu.";
       infoBox.style.display = "none";
+      setMsg("Masukkan license key terlebih dahulu.", "error");
       return;
     }
 
-    msg.textContent = "Mengambil data...";
+    setMsg("Mengambil data license...");
     infoBox.style.display = "none";
 
     try {
-      const data = await fetchInfo(key);
+      const res = await fetch(
+        `${API_BASE}/api/license/info?licenseKey=${encodeURIComponent(key)}`
+      );
+      const data = await res.json();
+
       if (!data.ok) {
-        msg.textContent = "Error: " + (data.message || "Gagal cek license");
+        setMsg(data.message || "License tidak ditemukan / invalid.", "error");
         return;
       }
 
       const lic = data.license;
-      infoBox.style.display = "block";
 
-      statusEl.textContent = lic.status;
-      statusEl.className = "value " +
+      statusEl.textContent = lic.status || "-";
+      statusEl.className =
+        "value " +
         (lic.status === "active"
           ? "status-active"
           : lic.status === "unused"
@@ -72,35 +67,49 @@ window.addEventListener("DOMContentLoaded", () => {
       firstEl.textContent = formatDate(lic.firstActivated);
       lastEl.textContent = formatDate(lic.lastCheckin);
 
-      msg.textContent = "";
+      infoBox.style.display = "block";
+      setMsg("");
     } catch (e) {
       console.error(e);
-      msg.textContent = "Gagal terhubung ke API.";
+      setMsg("Gagal terhubung ke server.", "error");
     }
-  };
+  });
 
-  btnRelease.onclick = async () => {
+  // Lepaskan device (user sendiri)
+  btnRelease.addEventListener("click", async () => {
     const key = input.value.trim();
-    if (!key) return;
+    if (!key) {
+      setMsg("Masukkan license key dulu.", "error");
+      return;
+    }
 
     if (!confirm("Yakin ingin melepaskan device dari license ini?")) return;
 
-    msg.textContent = "Memproses...";
+    setMsg("Memproses pelepasan device...");
+
     try {
-      const data = await releaseDevice(key);
+      const res = await fetch(`${API_BASE}/api/license/release`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ licenseKey: key })
+      });
+
+      const data = await res.json();
+
       if (!data.ok) {
-        msg.textContent = "Error: " + (data.message || "Gagal release");
+        setMsg(data.message || "Gagal melepaskan device.", "error");
         return;
       }
-      msg.textContent = "Device dilepas. License dapat dipakai di perangkat lain.";
+
+      setMsg("Device berhasil dilepas. License dapat digunakan di perangkat lain.");
       infoBox.style.display = "none";
     } catch (e) {
       console.error(e);
-      msg.textContent = "Gagal terhubung ke API.";
+      setMsg("Gagal terhubung ke server.", "error");
     }
-  };
+  });
 
-  // auto-isi dari ?license= di URL
+  // auto-isi dari ?license= kalau ada
   const params = new URLSearchParams(location.search);
   const lk = params.get("license");
   if (lk) {

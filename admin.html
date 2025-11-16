@@ -110,7 +110,7 @@
 <body>
   <div class="wrap">
 
-    <!-- LOGIN CARD -->
+    <!-- LOGIN -->
     <div class="card" id="login-card">
       <div class="title">Owner Login</div>
       <div class="subtitle">Masukkan password owner untuk mengelola license.</div>
@@ -123,7 +123,7 @@
       <div id="login-msg" class="small"></div>
     </div>
 
-    <!-- MAIN ADMIN CARD -->
+    <!-- FORM LICENSE -->
     <div class="card" id="admin-card" style="display:none;">
       <div class="title">Geekz License Owner Panel</div>
       <div class="subtitle">
@@ -131,7 +131,6 @@
         <span class="tag">Catatan:</span> Device akan terikat saat user aktivasi dari extension.
       </div>
 
-      <!-- FORM LICENSE -->
       <div class="row">
         <input id="f-licenseKey" class="full" placeholder="License Key (mis: GEEKZ-XXXX-XXXX)" />
       </div>
@@ -145,7 +144,7 @@
           <option value="active">active</option>
           <option value="disabled">disabled</option>
         </select>
-        <span class="small">(biasanya gunakan <b>unused</b> untuk license baru)</span>
+        <span class="small">(gunakan <b>unused</b> untuk license baru)</span>
       </div>
       <div class="row" style="justify-content:flex-end;">
         <button id="btn-clear" class="btn-ghost">Clear</button>
@@ -156,7 +155,7 @@
       <div id="admin-msg" class="small" style="margin-top:4px;"></div>
     </div>
 
-    <!-- LIST LICENSE -->
+    <!-- TABEL LICENSE -->
     <div class="card" id="list-card" style="display:none;">
       <div class="title">Daftar License</div>
       <div class="subtitle">Klik baris untuk load ke form.</div>
@@ -171,14 +170,13 @@
               <th>Aktif / Last</th>
             </tr>
           </thead>
-          <tbody id="tbl-body">
-          </tbody>
+          <tbody id="tbl-body"></tbody>
         </table>
       </div>
     </div>
 
   </div>
 
-  <script src="./admin.js"></script>
+  <script src="/admin.js"></script>
 </body>
 </html>
