@@ -1,14 +1,20 @@
-// api/admin/login.js
-const { isAdmin } = require("./_checkAdmin");
+import checkAdmin from "./_checkAdmin";
 
-module.exports = async (req, res) => {
-  if (req.method !== "POST") {
-    return res.status(405).json({ ok: false, message: "Method not allowed" });
-  }
+export default async function handler(req, res) {
+  const adminKey = req.headers["x-admin-key"] || "";
+  const valid = await checkAdmin(adminKey);
 
-  if (!isAdmin(req)) {
-    return res.status(401).json({ ok: false, message: "Password salah" });
-  }
+  if (!valid)
+    return res.status(401).json({ ok: false, message: "Invalid admin key" });
 
-  return res.json({ ok: true, message: "Login berhasil" });
-};
+  const fs = require("fs");
+  const path = require("path");
+  const file = path.join(process.cwd(), "licenses.json");
+
+  let data = [];
+  try {
+    data = JSON.parse(fs.readFileSync(file, "utf8"));
+  } catch {}
+
+  res.status(200).json({ ok: true, items: data });
+}
