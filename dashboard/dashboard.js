@@ -1,6 +1,6 @@
 // dashboard/dashboard.js
 
-const API_BASE = "";
+const API_BASE = "https://licensekey-cyan.vercel.app/";
 
 const $ = id => document.getElementById(id);
 
