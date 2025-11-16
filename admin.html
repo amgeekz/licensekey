@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <title>Geekz License Owner Panel</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #020617;
+      color: #e5e7eb;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 20px;
+    }
+    .wrap {
+      width: 100%;
+      max-width: 900px;
+    }
+    .card {
+      background: #0f172a;
+      border-radius: 14px;
+      padding: 16px 18px;
+      box-shadow: 0 20px 40px rgba(0,0,0,.6);
+      border: 1px solid rgba(148,163,184,.5);
+      margin-bottom: 14px;
+    }
+    .title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .subtitle {
+      font-size: 12px;
+      color: #9ca3af;
+      margin-bottom: 10px;
+    }
+    input, select {
+      padding: 5px 7px;
+      border-radius: 6px;
+      border: 1px solid rgba(148,163,184,.7);
+      background: #020617;
+      color: #f9fafb;
+      font-size: 12px;
+      outline: none;
+    }
+    input.full {
+      width: 100%;
+    }
+    button {
+      padding: 5px 10px;
+      border-radius: 6px;
+      border: 0;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg,#22c55e,#16a34a);
+      color: #022c22;
+      font-weight: 600;
+    }
+    .btn-danger {
+      background: #b91c1c;
+      color: #fee2e2;
+    }
+    .btn-ghost {
+      background: transparent;
+      border: 1px solid rgba(148,163,184,.7);
+      color: #e5e7eb;
+    }
+    .row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 11px;
+    }
+    th, td {
+      border-bottom: 1px solid rgba(30,64,175,.6);
+      padding: 4px 6px;
+      text-align: left;
+      vertical-align: top;
+    }
+    th {
+      font-size: 11px;
+      color: #9ca3af;
+    }
+    .status-active { color: #4ade80; font-weight: 600; }
+    .status-unused { color: #facc15; font-weight: 600; }
+    .status-other  { color: #f97316; font-weight: 600; }
+    .small {
+      font-size: 11px;
+      color: #9ca3af;
+    }
+    .tag {
+      font-size: 11px;
+      padding: 2px 4px;
+      border-radius: 4px;
+      background: rgba(148,163,184,.2);
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+
+    <!-- LOGIN CARD -->
+    <div class="card" id="login-card">
+      <div class="title">Owner Login</div>
+      <div class="subtitle">Masukkan password owner untuk mengelola license.</div>
+      <div class="row">
+        <input id="admin-pass" type="password" placeholder="Owner password" class="full" />
+      </div>
+      <div class="row" style="justify-content:flex-end;">
+        <button id="btn-login" class="btn-primary">Login</button>
+      </div>
+      <div id="login-msg" class="small"></div>
+    </div>
+
+    <!-- MAIN ADMIN CARD -->
+    <div class="card" id="admin-card" style="display:none;">
+      <div class="title">Geekz License Owner Panel</div>
+      <div class="subtitle">
+        Tambah / edit / hapus license Digiflazz Auto Update.<br>
+        <span class="tag">Catatan:</span> Device akan terikat saat user aktivasi dari extension.
+      </div>
+
+      <!-- FORM LICENSE -->
+      <div class="row">
+        <input id="f-licenseKey" class="full" placeholder="License Key (mis: GEEKZ-XXXX-XXXX)" />
+      </div>
+      <div class="row">
+        <input id="f-ownerEmail" class="full" placeholder="Owner Email (opsional)" />
+      </div>
+      <div class="row">
+        <span class="small">Status:</span>
+        <select id="f-status">
+          <option value="unused">unused</option>
+          <option value="active">active</option>
+          <option value="disabled">disabled</option>
+        </select>
+        <span class="small">(biasanya gunakan <b>unused</b> untuk license baru)</span>
+      </div>
+      <div class="row" style="justify-content:flex-end;">
+        <button id="btn-clear" class="btn-ghost">Clear</button>
+        <button id="btn-save" class="btn-primary">Simpan / Update</button>
+        <button id="btn-delete" class="btn-danger">Hapus</button>
+      </div>
+
+      <div id="admin-msg" class="small" style="margin-top:4px;"></div>
+    </div>
+
+    <!-- LIST LICENSE -->
+    <div class="card" id="list-card" style="display:none;">
+      <div class="title">Daftar License</div>
+      <div class="subtitle">Klik baris untuk load ke form.</div>
+      <div style="max-height: 320px; overflow:auto; border-radius:8px; border:1px solid rgba(30,64,175,.6);">
+        <table id="tbl-licenses">
+          <thead>
+            <tr>
+              <th>License</th>
+              <th>Owner</th>
+              <th>Status</th>
+              <th>Device</th>
+              <th>Aktif / Last</th>
+            </tr>
+          </thead>
+          <tbody id="tbl-body">
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="./admin.js"></script>
+</body>
+</html>
