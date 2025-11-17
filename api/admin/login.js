@@ -1,4 +1,4 @@
-import checkAdmin from '../_checkAdmin.js';
+import checkAdmin from './_checkAdmin.js';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
