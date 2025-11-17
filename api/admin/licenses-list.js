@@ -1,21 +1,35 @@
-import checkAdmin from "./_checkAdmin";
+import { db } from '../../lib/firebaseAdmin.js';
+import checkAdmin from '../_checkAdmin.js';
 
 export default async function handler(req, res) {
-  const adminKey = req.headers["x-admin-key"] || "";
+  const adminKey = req.headers['x-admin-key'] || '';
   const valid = await checkAdmin(adminKey);
 
-  if (!valid)
-    return res.status(401).json({ ok: false, message: "Invalid admin key" });
+  if (!valid) {
+    return res.status(401).json({ ok: false, message: 'Invalid admin key' });
+  }
 
-  // AMBIL DATA FILE JSON DI ROOT
-  const fs = require("fs");
-  const path = require("path");
-  const file = path.join(process.cwd(), "licenses.json");
-
-  let data = [];
   try {
-    data = JSON.parse(fs.readFileSync(file, "utf8"));
-  } catch {}
+    const licensesRef = db.collection('licenses');
+    const snapshot = await licensesRef.get();
+    
+    const items = [];
+    snapshot.forEach(doc => {
+      const data = doc.data();
+      items.push({
+        licenseKey: data.licenseKey,
+        ownerEmail: data.ownerEmail || '',
+        status: data.status || 'unused',
+        deviceId: data.deviceId || null,
+        deviceName: data.deviceName || null,
+        firstActivated: data.firstActivated ? data.firstActivated.toDate() : null,
+        lastCheckin: data.lastCheckin ? data.lastCheckin.toDate() : null
+      });
+    });
 
-  res.status(200).json({ ok: true, items: data });
+    res.status(200).json({ ok: true, items });
+  } catch (err) {
+    console.error('Licenses list error:', err);
+    res.status(500).json({ ok: false, message: 'Database error' });
+  }
 }
