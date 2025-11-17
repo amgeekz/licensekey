@@ -1,4 +1,3 @@
-// api/admin/login.js
 import checkAdmin from "../_checkAdmin.js";
 
 export default async function handler(req, res) {
@@ -7,17 +6,27 @@ export default async function handler(req, res) {
   }
 
   const adminKey = req.headers["x-admin-key"] || "";
-  const valid = await checkAdmin(adminKey);
+  
+  try {
+    const valid = await checkAdmin(adminKey);
+    
+    if (!valid) {
+      console.log("Invalid admin password attempt");
+      return res.status(401).json({ 
+        ok: false, 
+        message: "Invalid admin password" 
+      });
+    }
 
-  if (!valid) {
-    return res.status(401).json({ 
+    return res.status(200).json({ 
+      ok: true, 
+      message: "Login berhasil" 
+    });
+  } catch (error) {
+    console.error("Login error:", error);
+    return res.status(500).json({ 
       ok: false, 
-      message: "Invalid admin password" 
+      message: "Server error" 
     });
   }
-
-  return res.status(200).json({ 
-    ok: true, 
-    message: "Login berhasil" 
-  });
 }
