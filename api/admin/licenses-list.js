@@ -1,5 +1,5 @@
 import { db } from '../../lib/firebaseAdmin.js';
-import checkAdmin from '../_checkAdmin.js';
+import checkAdmin from './_checkAdmin.js';
 
 export default async function handler(req, res) {
   const adminKey = req.headers['x-admin-key'] || '';
