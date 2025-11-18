@@ -1,7 +1,16 @@
-// api/license/activate.js
 import { db, admin } from "../../lib/firebaseAdmin.js";
 
 export default async function handler(req, res) {
+  // === CORS HEADERS - PASTIKAN INI ADA ===
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, X-Admin-Key');
+  
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+  // === END CORS ===
+
   if (req.method !== "POST") {
     return res.status(405).json({ ok: false, message: "Method not allowed" });
   }
