@@ -1,6 +1,6 @@
 // dashboard.js
 
-const API_BASE = "https://licensekey-cyan.vercel.app/"; // kosong = origin yang sama
+const API_BASE = "https://license.amgeekz.my.id/"; // kosong = origin yang sama
 
 const $ = id => document.getElementById(id);
 
