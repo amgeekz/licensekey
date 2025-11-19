@@ -50,6 +50,7 @@ export default async function handler(req, res) {
           firstActivated: productData.firstActivated || now,
           lastCheckin: now
         },
+        status: "active",
         lastCheckin: now
       });
       return res.json({ 

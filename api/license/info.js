@@ -28,6 +28,35 @@ export default async function handler(req, res) {
     }
 
     const lic = snap.data();
+    
+    let products = lic.products || {};
+    
+    if (!lic.products && lic.deviceId) {
+      products = {
+        digiflazz: {
+          status: lic.status || "active",
+          deviceId: lic.deviceId,
+          deviceName: lic.deviceName,
+          firstActivated: lic.firstActivated,
+          lastCheckin: lic.lastCheckin
+        },
+        whatsapp: { status: "unused" },
+        telegram: { status: "unused" }
+      };
+      
+      try {
+        await docRef.update({
+          products: products
+        });
+        console.log("Updated legacy license to multi-product format:", licenseKey);
+      } catch (updateError) {
+        console.log("Could not update legacy format:", updateError.message);
+      }
+    }
+    
+    if (!products.digiflazz) products.digiflazz = { status: "unused" };
+    if (!products.whatsapp) products.whatsapp = { status: "unused" };
+    if (!products.telegram) products.telegram = { status: "unused" };
 
     return res.json({
       ok: true,
@@ -35,11 +64,7 @@ export default async function handler(req, res) {
         licenseKey: lic.licenseKey,
         ownerEmail: lic.ownerEmail || null,
         status: lic.status || "unknown",
-        products: lic.products || {
-          digiflazz: { status: "unused" },
-          whatsapp: { status: "unused" },
-          telegram: { status: "unused" }
-        },
+        products: products,
         firstActivated: lic.firstActivated ? lic.firstActivated.toDate() : null,
         lastCheckin: lic.lastCheckin ? lic.lastCheckin.toDate() : null
       }
