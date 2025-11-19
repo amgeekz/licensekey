@@ -1,5 +1,3 @@
-// dashboard.js
-
 const API_BASE = "https://license.amgeekz.my.id/";
 
 const $ = id => document.getElementById(id);
@@ -77,6 +75,10 @@ window.addEventListener("DOMContentLoaded", () => {
       
       const data = await res.json();
 
+      console.log("Full API Response:", data);
+      console.log("License Data:", data.license);
+      console.log("Products Data:", data.license?.products);
+
       if (!data.ok) {
         setMsg(data.message || "License tidak ditemukan / invalid.", "error");
         return;
@@ -92,6 +94,8 @@ window.addEventListener("DOMContentLoaded", () => {
       );
 
       const products = lic.products || {};
+      console.log("Digiflazz Product:", products.digiflazz);
+      
       renderProductStatus("digiflazz", products.digiflazz);
       renderProductStatus("whatsapp", products.whatsapp);
       renderProductStatus("telegram", products.telegram);
@@ -107,7 +111,6 @@ window.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Lepaskan device
   btnRelease.addEventListener("click", async () => {
     const key = input.value.trim();
     if (!key) {
@@ -159,7 +162,6 @@ window.addEventListener("DOMContentLoaded", () => {
     }, 100);
   }
 
-  // Enter key support
   input.addEventListener("keypress", (e) => {
     if (e.key === "Enter") {
       btnCheck.click();
