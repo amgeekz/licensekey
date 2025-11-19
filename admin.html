@@ -313,57 +313,46 @@
 
     <!-- Management Card -->
     <div class="card" id="admin-card" style="display:none;">
-      <h2 class="card-title">📦 License Management</h2>
-      <p class="card-subtitle">
-        Tambah, edit, atau hapus license key untuk sistem Digiflazz Auto Update
-        <br><span class="tag">Info:</span> Device akan terikat otomatis saat user aktivasi pertama kali
-      </p>
+  <h2 class="card-title">📦 License Management</h2>
+  <p class="card-subtitle">
+    Kelola license key untuk semua produk: Digiflazz Extension, WhatsApp Bot, dan Telegram Bot
+  </p>
 
-      <div class="form-group">
-        <input 
-          id="f-licenseKey" 
-          class="full" 
-          placeholder="License Key (format: GEEKZ-XXXX-XXXX)" 
-        />
-      </div>
-      
-      <div class="form-group">
-        <input 
-          id="f-ownerEmail" 
-          class="full" 
-          placeholder="Email Pemilik (opsional)" 
-        />
-      </div>
-      
-      <div class="form-group">
-        <div class="flex items-center flex-wrap" style="gap: 12px;">
-          <span class="small">Status License:</span>
-          <select id="f-status">
-            <option value="unused">🆕 Unused</option>
-            <option value="active">✅ Active</option>
-            <option value="disabled">❌ Disabled</option>
-          </select>
-          <span class="small">Gunakan <b>unused</b> untuk license baru</span>
-        </div>
-      </div>
-
-      <div class="flex justify-end flex-wrap" style="gap: 12px;">
-        <button id="btn-clear" class="btn btn-ghost">
-          <span>🗑️</span>
-          Clear Form
-        </button>
-        <button id="btn-save" class="btn btn-primary">
-          <span>💾</span>
-          Simpan / Update
-        </button>
-        <button id="btn-delete" class="btn btn-danger">
-          <span>⛔</span>
-          Hapus License
-        </button>
-      </div>
-
-      <div id="admin-msg" class="message"></div>
+  <div class="form-group">
+    <input 
+      id="f-licenseKey" 
+      class="full" 
+      placeholder="License Key (format: GEEKZ-XXXX-XXXX)" 
+    />
+  </div>
+  
+  <div class="form-group">
+    <input 
+      id="f-ownerEmail" 
+      class="full" 
+      placeholder="Email Pemilik (opsional)" 
+    />
+  </div>
+  
+  <div class="form-group">
+    <div class="flex items-center flex-wrap" style="gap: 12px;">
+      <span class="small">Status Overall:</span>
+      <select id="f-status">
+        <option value="unused">🆕 Unused</option>
+        <option value="active">✅ Active</option>
+        <option value="disabled">❌ Disabled</option>
+      </select>
     </div>
+  </div>
+
+  <div class="flex justify-end flex-wrap" style="gap: 12px;">
+    <button id="btn-clear" class="btn btn-ghost">Clear Form</button>
+    <button id="btn-save" class="btn btn-primary">Simpan / Update</button>
+    <button id="btn-delete" class="btn btn-danger">Hapus License</button>
+  </div>
+
+  <div id="admin-msg" class="message"></div>
+</div>
 
     <!-- License List Card -->
     <div class="card" id="list-card" style="display:none;">

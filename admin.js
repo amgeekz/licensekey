@@ -1,5 +1,5 @@
 const $ = id => document.getElementById(id);
-const API_BASE = "https://license.amgeekz.my.id/";
+const API_BASE = "https://licensekey-cyan.vercel.app/";
 
 function getAdminKey() {
   return localStorage.getItem("geekz_admin_key") || "";

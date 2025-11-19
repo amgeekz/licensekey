@@ -1,6 +1,6 @@
 // dashboard.js
 
-const API_BASE = "https://license.amgeekz.my.id/"; // kosong = origin yang sama
+const API_BASE = "https://licensekey-cyan.vercel.app/";
 
 const $ = id => document.getElementById(id);
 
@@ -11,20 +11,48 @@ function formatDate(d) {
   return dt.toLocaleString("id-ID");
 }
 
+function renderProductStatus(productId, productData) {
+  const element = document.getElementById(`product-${productId}`);
+  if (!element) return;
+  
+  if (!productData || productData.status === "unused") {
+    element.textContent = "❌ Belum diaktivasi";
+    element.className = "info-value status-other";
+  } else if (productData.status === "active") {
+    const deviceName = productData.deviceName || "Unknown Device";
+    element.textContent = `✅ Aktif (${deviceName})`;
+    element.className = "info-value status-active";
+  } else {
+    element.textContent = "⛔ Dinonaktifkan";
+    element.className = "info-value status-other";
+  }
+}
+
+function setMsg(text, type = "info") {
+  const msg = $("msg");
+  if (!msg) return;
+  
+  msg.textContent = text || "";
+  msg.className = "message";
+  if (type === "error") {
+    msg.classList.add("error");
+  } else if (type === "success") {
+    msg.classList.add("success");
+  }
+}
+
 window.addEventListener("DOMContentLoaded", () => {
   const input = $("lic-input");
   const btnCheck = $("btn-check");
   const btnRelease = $("btn-release");
-  const msg = $("msg");
   const infoBox = $("lic-info");
   const statusEl = $("lic-status");
-  const deviceEl = $("lic-device");
   const firstEl = $("lic-first");
   const lastEl = $("lic-last");
 
-  function setMsg(text, type = "info") {
-    msg.textContent = text || "";
-    msg.style.color = type === "error" ? "#f97373" : "#9ca3af";
+  if (!input || !btnCheck || !infoBox) {
+    console.error("Element not found");
+    return;
   }
 
   btnCheck.addEventListener("click", async () => {
@@ -42,6 +70,11 @@ window.addEventListener("DOMContentLoaded", () => {
       const res = await fetch(
         `${API_BASE}/api/license/info?licenseKey=${encodeURIComponent(key)}`
       );
+      
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+      
       const data = await res.json();
 
       if (!data.ok) {
@@ -52,17 +85,16 @@ window.addEventListener("DOMContentLoaded", () => {
       const lic = data.license;
 
       statusEl.textContent = lic.status || "-";
-      statusEl.className =
-        "value " +
-        (lic.status === "active"
-          ? "status-active"
-          : lic.status === "unused"
-          ? "status-unused"
-          : "status-other");
+      statusEl.className = "info-value " + (
+        lic.status === "active" ? "status-active" :
+        lic.status === "unused" ? "status-unused" :
+        "status-other"
+      );
 
-      deviceEl.textContent = lic.deviceId
-        ? `${lic.deviceName || "(tanpa nama)"} (${lic.deviceId})`
-        : "Belum terikat ke device manapun.";
+      const products = lic.products || {};
+      renderProductStatus("digiflazz", products.digiflazz);
+      renderProductStatus("whatsapp", products.whatsapp);
+      renderProductStatus("telegram", products.telegram);
 
       firstEl.textContent = formatDate(lic.firstActivated);
       lastEl.textContent = formatDate(lic.lastCheckin);
@@ -70,12 +102,12 @@ window.addEventListener("DOMContentLoaded", () => {
       infoBox.style.display = "block";
       setMsg("");
     } catch (e) {
-      console.error(e);
+      console.error("Fetch error:", e);
       setMsg("Gagal terhubung ke server.", "error");
     }
   });
 
-  // Lepaskan device (user sendiri)
+  // Lepaskan device
   btnRelease.addEventListener("click", async () => {
     const key = input.value.trim();
     if (!key) {
@@ -91,8 +123,15 @@ window.addEventListener("DOMContentLoaded", () => {
       const res = await fetch(`${API_BASE}/api/license/release`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ licenseKey: key })
+        body: JSON.stringify({ 
+          licenseKey: key,
+          product: "digiflazz"
+        })
       });
+
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
 
       const data = await res.json();
 
@@ -101,19 +140,29 @@ window.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
-      setMsg("Device berhasil dilepas. License dapat digunakan di perangkat lain.");
+      setMsg("Device berhasil dilepas. License dapat digunakan di perangkat lain.", "success");
       infoBox.style.display = "none";
+      
+      input.value = "";
     } catch (e) {
-      console.error(e);
+      console.error("Release error:", e);
       setMsg("Gagal terhubung ke server.", "error");
     }
   });
-
-  // auto-isi dari ?license= kalau ada
+  
   const params = new URLSearchParams(location.search);
   const lk = params.get("license");
   if (lk) {
     input.value = lk;
-    btnCheck.click();
+    setTimeout(() => {
+      btnCheck.click();
+    }, 100);
   }
+
+  // Enter key support
+  input.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") {
+      btnCheck.click();
+    }
+  });
 });
