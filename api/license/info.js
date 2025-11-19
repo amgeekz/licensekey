@@ -1,7 +1,14 @@
-// api/license/info.js
 import { db } from "../../lib/firebaseAdmin.js";
 
 export default async function handler(req, res) {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, X-Admin-Key');
+  
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+
   if (req.method !== "GET") {
     return res.status(405).json({ ok: false, message: "Method not allowed" });
   }
@@ -27,9 +34,12 @@ export default async function handler(req, res) {
       license: {
         licenseKey: lic.licenseKey,
         ownerEmail: lic.ownerEmail || null,
-        deviceId: lic.deviceId || null,
-        deviceName: lic.deviceName || null,
         status: lic.status || "unknown",
+        products: lic.products || {
+          digiflazz: { status: "unused" },
+          whatsapp: { status: "unused" },
+          telegram: { status: "unused" }
+        },
         firstActivated: lic.firstActivated ? lic.firstActivated.toDate() : null,
         lastCheckin: lic.lastCheckin ? lic.lastCheckin.toDate() : null
       }

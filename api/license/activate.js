@@ -1,7 +1,6 @@
 import { db, admin } from "../../lib/firebaseAdmin.js";
 
 export default async function handler(req, res) {
-  // === CORS HEADERS - PASTIKAN INI ADA ===
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, X-Admin-Key');
@@ -9,17 +8,21 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
   }
-  // === END CORS ===
 
   if (req.method !== "POST") {
     return res.status(405).json({ ok: false, message: "Method not allowed" });
   }
 
   try {
-    const { licenseKey, deviceId, deviceName } = req.body || {};
+    const { licenseKey, deviceId, deviceName, product = "digiflazz" } = req.body || {};
 
     if (!licenseKey || !deviceId) {
       return res.status(400).json({ ok: false, message: "licenseKey / deviceId kosong" });
+    }
+
+    const validProducts = ["digiflazz", "whatsapp", "telegram"];
+    if (!validProducts.includes(product)) {
+      return res.status(400).json({ ok: false, message: "Product tidak valid" });
     }
 
     const docRef = db.collection("licenses").doc(licenseKey);
@@ -30,30 +33,50 @@ export default async function handler(req, res) {
     }
 
     const lic = snap.data();
-
-    if (!lic.deviceId) {
-      await docRef.update({
-        deviceId,
-        deviceName: deviceName || null,
-        status: "active",
-        firstActivated: lic.firstActivated || admin.firestore.FieldValue.serverTimestamp(),
-        lastCheckin: admin.firestore.FieldValue.serverTimestamp()
-      });
-      return res.json({ ok: true, message: "Aktivasi berhasil (pertama kali)" });
+    
+    if (lic.status === "disabled") {
+      return res.status(403).json({ ok: false, message: "License dinonaktifkan" });
     }
 
-    if (lic.deviceId === deviceId) {
+    const productData = lic.products?.[product] || {};
+    const now = admin.firestore.FieldValue.serverTimestamp();
+
+    if (!productData.deviceId) {
       await docRef.update({
-        status: "active",
-        lastCheckin: admin.firestore.FieldValue.serverTimestamp()
+        [`products.${product}`]: {
+          status: "active",
+          deviceId,
+          deviceName: deviceName || null,
+          firstActivated: productData.firstActivated || now,
+          lastCheckin: now
+        },
+        lastCheckin: now
       });
-      return res.json({ ok: true, message: "Device sama, diizinkan" });
+      return res.json({ 
+        ok: true, 
+        message: `Aktivasi ${product} berhasil`,
+        product: product
+      });
+    }
+
+    if (productData.deviceId === deviceId) {
+      await docRef.update({
+        [`products.${product}.lastCheckin`]: now,
+        [`products.${product}.status`]: "active",
+        lastCheckin: now
+      });
+      return res.json({ 
+        ok: true, 
+        message: `Device ${product} sama, diizinkan`,
+        product: product
+      });
     }
 
     return res.status(403).json({
       ok: false,
-      message: "License sudah digunakan di perangkat lain. Lepaskan dulu dari dashboard."
+      message: `License sudah digunakan di perangkat ${product} lain.`
     });
+
   } catch (err) {
     console.error("License activate error:", err);
     return res.status(500).json({ ok: false, message: "Server error" });
