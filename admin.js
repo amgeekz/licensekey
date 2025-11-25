@@ -58,6 +58,7 @@ function showLoginPanel() {
 }
 
 function logout() {
+  console.log('Logout function called');
   clearAdminToken();
   showLoginPanel();
   $("admin-pass").value = "";
@@ -104,8 +105,6 @@ function renderLicenses(items) {
   items.forEach(it => {
     const tr = document.createElement("tr");
     tr.style.cursor = "pointer";
-    
-    console.log('License data:', it);
     
     const deviceInfo = [];
     
@@ -170,21 +169,23 @@ function updateStats(items) {
 
 async function loadLicenses() {
   $("admin-msg").textContent = "Memuat daftar license...";
-  const { status, data } = await apiFetch("/api/admin/licenses-list");
   
-  console.log('API Response:', { status, data });
-  
-  if (!data.ok || status !== 200) {
-    $("admin-msg").textContent = "Gagal load license: " + (data.message || "Unknown error");
-    return;
+  try {
+    const { status, data } = await apiFetch("/api/admin/licenses-list");
+    
+    if (!data.ok || status !== 200) {
+      $("admin-msg").textContent = "Gagal load license: " + (data.message || "Unknown error");
+      return;
+    }
+    
+    $("admin-msg").textContent = "";
+    const items = data.items || [];
+    renderLicenses(items);
+    updateStats(items);
+  } catch (error) {
+    console.error('Load licenses error:', error);
+    $("admin-msg").textContent = "Error loading licenses: " + error.message;
   }
-  
-  console.log('Licenses data:', data.items);
-  $("admin-msg").textContent = "";
-  
-  const items = data.items || [];
-  renderLicenses(items);
-  updateStats(items);
 }
 
 async function saveLicense() {
@@ -198,18 +199,24 @@ async function saveLicense() {
   }
 
   $("admin-msg").textContent = "Menyimpan license...";
-  const { status: st, data } = await apiFetch("/api/admin/license-save", {
-    method: "POST",
-    body: { licenseKey, ownerEmail, status }
-  });
+  
+  try {
+    const { status: st, data } = await apiFetch("/api/admin/license-save", {
+      method: "POST",
+      body: { licenseKey, ownerEmail, status }
+    });
 
-  if (!data.ok || st !== 200) {
-    $("admin-msg").textContent = "Gagal simpan license: " + (data.message || "Unknown error");
-    return;
+    if (!data.ok || st !== 200) {
+      $("admin-msg").textContent = "Gagal simpan license: " + (data.message || "Unknown error");
+      return;
+    }
+
+    $("admin-msg").textContent = "License tersimpan.";
+    loadLicenses();
+  } catch (error) {
+    console.error('Save license error:', error);
+    $("admin-msg").textContent = "Error saving license: " + error.message;
   }
-
-  $("admin-msg").textContent = "License tersimpan.";
-  loadLicenses();
 }
 
 async function deleteLicense() {
@@ -218,24 +225,31 @@ async function deleteLicense() {
     $("admin-msg").textContent = "Isi license key yang mau dihapus.";
     return;
   }
+  
   if (!confirm("Yakin hapus license: " + licenseKey + " ?")) return;
 
   $("admin-msg").textContent = "Menghapus license...";
-  const { status: st, data } = await apiFetch("/api/admin/license-delete", {
-    method: "POST",
-    body: { licenseKey }
-  });
+  
+  try {
+    const { status: st, data } = await apiFetch("/api/admin/license-delete", {
+      method: "POST",
+      body: { licenseKey }
+    });
 
-  if (!data.ok || st !== 200) {
-    $("admin-msg").textContent = "Gagal hapus license: " + (data.message || "Unknown error");
-    return;
+    if (!data.ok || st !== 200) {
+      $("admin-msg").textContent = "Gagal hapus license: " + (data.message || "Unknown error");
+      return;
+    }
+
+    $("admin-msg").textContent = "License dihapus.";
+    $("f-licenseKey").value = "";
+    $("f-ownerEmail").value = "";
+    $("f-status").value = "unused";
+    loadLicenses();
+  } catch (error) {
+    console.error('Delete license error:', error);
+    $("admin-msg").textContent = "Error deleting license: " + error.message;
   }
-
-  $("admin-msg").textContent = "License dihapus.";
-  $("f-licenseKey").value = "";
-  $("f-ownerEmail").value = "";
-  $("f-status").value = "unused";
-  loadLicenses();
 }
 
 function clearForm() {
@@ -245,21 +259,58 @@ function clearForm() {
   $("admin-msg").textContent = "Form dibersihkan.";
 }
 
-window.addEventListener("DOMContentLoaded", () => {
-  $("btn-login").addEventListener("click", tryLogin);
-  $("btn-logout").addEventListener("click", logout);
-  $("admin-pass").addEventListener("keydown", e => {
-    if (e.key === "Enter") tryLogin();
-  });
+function initEventListeners() {
+  console.log('Initializing event listeners...');
+  
+  const btnLogin = $("btn-login");
+  const btnLogout = $("btn-logout");
+  const btnSave = $("btn-save");
+  const btnDelete = $("btn-delete");
+  const btnClear = $("btn-clear");
+  const adminPass = $("admin-pass");
 
-  $("btn-save").addEventListener("click", saveLicense);
-  $("btn-delete").addEventListener("click", deleteLicense);
-  $("btn-clear").addEventListener("click", clearForm);
+  if (btnLogin) {
+    btnLogin.addEventListener("click", tryLogin);
+    console.log('Login button listener added');
+  }
 
-  if (getAdminToken()) {
+  if (btnLogout) {
+    btnLogout.addEventListener("click", logout);
+    console.log('Logout button listener added');
+  }
+
+  if (adminPass) {
+    adminPass.addEventListener("keydown", e => {
+      if (e.key === "Enter") tryLogin();
+    });
+  }
+
+  if (btnSave) btnSave.addEventListener("click", saveLicense);
+  if (btnDelete) btnDelete.addEventListener("click", deleteLicense);
+  if (btnClear) btnClear.addEventListener("click", clearForm);
+}
+
+function checkAuthStatus() {
+  const token = getAdminToken();
+  console.log('Auth check - Token exists:', !!token);
+  
+  if (token) {
     showAdminPanel();
     loadLicenses();
   } else {
     showLoginPanel();
+  }
+}
+
+window.addEventListener("DOMContentLoaded", () => {
+  console.log('DOM fully loaded');
+  initEventListeners();
+  checkAuthStatus();
+});
+
+window.addEventListener('click', (e) => {
+  if (e.target.id === 'btn-logout') {
+    console.log('Logout button clicked via window listener');
+    logout();
   }
 });
