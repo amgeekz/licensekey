@@ -11,18 +11,23 @@ function formatDate(d) {
 
 function renderProductStatus(productId, productData) {
   const element = document.getElementById(`product-${productId}`);
+  const releaseButton = document.getElementById(`btn-release-${productId}`);
+  
   if (!element) return;
   
   if (!productData || productData.status === "unused") {
     element.textContent = "❌ Belum diaktivasi";
     element.className = "info-value status-other";
+    if (releaseButton) releaseButton.style.display = "none";
   } else if (productData.status === "active") {
     const deviceName = productData.deviceName || "Unknown Device";
     element.textContent = `✅ Aktif (${deviceName})`;
     element.className = "info-value status-active";
+    if (releaseButton) releaseButton.style.display = "inline-flex";
   } else {
     element.textContent = "⛔ Dinonaktifkan";
     element.className = "info-value status-other";
+    if (releaseButton) releaseButton.style.display = "none";
   }
 }
 
@@ -36,6 +41,45 @@ function setMsg(text, type = "info") {
     msg.classList.add("error");
   } else if (type === "success") {
     msg.classList.add("success");
+  }
+}
+
+async function releaseDevice(licenseKey, product) {
+  if (!confirm(`Yakin ingin melepaskan device ${product} dari license ini?`)) return;
+
+  setMsg(`Memproses pelepasan device ${product}...`);
+
+  try {
+    const res = await fetch(`${API_BASE}/api/license/release`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ 
+        licenseKey: licenseKey,
+        product: product
+      })
+    });
+
+    if (!res.ok) {
+      throw new Error(`HTTP error! status: ${res.status}`);
+    }
+
+    const data = await res.json();
+
+    if (!data.ok) {
+      setMsg(data.message || `Gagal melepaskan device ${product}.`, "error");
+      return;
+    }
+
+    setMsg(`✅ ${data.message}`, "success");
+    
+    // Refresh license info setelah release
+    setTimeout(() => {
+      $("btn-check").click();
+    }, 1500);
+    
+  } catch (e) {
+    console.error("Release error:", e);
+    setMsg("❌ Gagal terhubung ke server.", "error");
   }
 }
 
@@ -100,6 +144,21 @@ window.addEventListener("DOMContentLoaded", () => {
       renderProductStatus("whatsapp", products.whatsapp);
       renderProductStatus("telegram", products.telegram);
 
+      // Setup release buttons untuk masing-masing product
+      const releaseDigiflazz = $("btn-release-digiflazz");
+      const releaseWhatsapp = $("btn-release-whatsapp");
+      const releaseTelegram = $("btn-release-telegram");
+
+      if (releaseDigiflazz) {
+        releaseDigiflazz.onclick = () => releaseDevice(key, "digiflazz");
+      }
+      if (releaseWhatsapp) {
+        releaseWhatsapp.onclick = () => releaseDevice(key, "whatsapp");
+      }
+      if (releaseTelegram) {
+        releaseTelegram.onclick = () => releaseDevice(key, "telegram");
+      }
+
       firstEl.textContent = formatDate(lic.firstActivated);
       lastEl.textContent = formatDate(lic.lastCheckin);
 
@@ -111,6 +170,7 @@ window.addEventListener("DOMContentLoaded", () => {
     }
   });
 
+  // Button release lama (untuk backward compatibility)
   btnRelease.addEventListener("click", async () => {
     const key = input.value.trim();
     if (!key) {
@@ -118,9 +178,9 @@ window.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    if (!confirm("Yakin ingin melepaskan device dari license ini?")) return;
+    if (!confirm("Yakin ingin melepaskan device Digiflazz dari license ini?")) return;
 
-    setMsg("Memproses pelepasan device...");
+    setMsg("Memproses pelepasan device Digiflazz...");
 
     try {
       const res = await fetch(`${API_BASE}/api/license/release`, {
