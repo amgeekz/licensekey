@@ -67,22 +67,25 @@ function renderLicenses(items) {
   items.forEach(it => {
     const tr = document.createElement("tr");
     tr.style.cursor = "pointer";
+    const devices = [];
     
-    const deviceInfo = [];
-    const products = ['digiflazz', 'whatsapp', 'telegram'];
-    const icons = {'digiflazz': '🔧', 'whatsapp': '💬', 'telegram': '📱'};
+    if (it.products?.digiflazz?.deviceId) {
+      const digiflazz = it.products.digiflazz;
+      devices.push(`🔧 Digiflazz: ${digiflazz.deviceName || ''}<br><span class="small">${digiflazz.deviceId}</span>`);
+    }
     
-    products.forEach(product => {
-      const prod = it.products?.[product];
-      if (prod?.deviceId) {
-        deviceInfo.push(
-          `${icons[product]} ${product.charAt(0).toUpperCase() + product.slice(1)}: ${prod.deviceName || ''}<br><span class="small">${prod.deviceId}</span>`
-        );
-      }
-    });
+    if (it.products?.whatsapp?.deviceId) {
+      const whatsapp = it.products.whatsapp;
+      devices.push(`💬 WhatsApp: ${whatsapp.deviceName || ''}<br><span class="small">${whatsapp.deviceId}</span>`);
+    }
+   
+    if (it.products?.telegram?.deviceId) {
+      const telegram = it.products.telegram;
+      devices.push(`📱 Telegram: ${telegram.deviceName || ''}<br><span class="small">${telegram.deviceId}</span>`);
+    }
     
-    const deviceDisplay = deviceInfo.length > 0 
-      ? deviceInfo.join('<br><br>')
+    const deviceDisplay = devices.length > 0 
+      ? devices.join('<br><br>')
       : "<span class='small'>-</span>";
 
     tr.innerHTML = `
