@@ -146,6 +146,16 @@ function renderLicenses(items) {
   });
 }
 
+function updateStats(items) {
+  const total = items.length;
+  const active = items.filter(item => item.status === 'active').length;
+  const unused = items.filter(item => item.status === 'unused').length;
+  
+  $("total-licenses").textContent = total;
+  $("active-licenses").textContent = active;
+  $("unused-licenses").textContent = unused;
+}
+
 async function loadLicenses() {
   $("admin-msg").textContent = "Memuat daftar license...";
   const { status, data } = await apiFetch("/api/admin/licenses-list");
@@ -159,7 +169,10 @@ async function loadLicenses() {
   
   console.log('Licenses data:', data.items);
   $("admin-msg").textContent = "";
-  renderLicenses(data.items || []);
+  
+  const items = data.items || [];
+  renderLicenses(items);
+  updateStats(items);
 }
 
 async function saveLicense() {
