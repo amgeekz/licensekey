@@ -43,22 +43,21 @@
     }
 
     .admin-header {
-      background: rgba(15, 23, 42, 0.8);
-      backdrop-filter: blur(20px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 20px;
-      padding: 25px 30px;
-      margin-bottom: 30px;
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      box-shadow: 
-        0 20px 40px rgba(0, 0, 0, 0.4),
-        inset 0 1px 0 rgba(255, 255, 255, 0.1);
-      position: relative;
-      overflow: hidden;
-      gap: 20px;
-    }
+  background: rgba(15, 23, 42, 0.8);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  padding: 25px 30px;
+  margin-bottom: 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 
+    0 20px 40px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  position: relative;
+  overflow: hidden;
+}
 
     .admin-header::before {
       content: '';
@@ -83,13 +82,11 @@
 
     .header-content {
       flex: 1;
-      min-width: 0;
     }
 
     .header-actions {
       flex-shrink: 0;
-      display: flex;
-      align-items: flex-start;
+      margin-top: -35px;
     }
 
     .header-badge {
@@ -149,27 +146,26 @@
     }
 
     .logout-btn {
-      background: rgba(239, 68, 68, 0.1);
-      color: #fca5a5;
-      border: 1px solid rgba(239, 68, 68, 0.3);
-      padding: 10px 16px;
-      border-radius: 10px;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      white-space: nowrap;
-      flex-shrink: 0;
-    }
+  background: rgba(239, 68, 68, 0.1);
+  color: #fca5a5;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
 
     .logout-btn:hover {
-      background: rgba(239, 68, 68, 0.2);
-      transform: translateY(-2px);
-      box-shadow: 0 8px 20px rgba(239, 68, 68, 0.3);
-    }
+  background: rgba(239, 68, 68, 0.2);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
 
     .header {
       text-align: center;
@@ -413,32 +409,32 @@
 <body>
   <div class="container">
     <div class="admin-header" id="admin-header" style="display:none;">
-      <div class="header-content">
-        <div class="header-badge">Owner Panel</div>
-        <h1 class="main-title">Geekz License Management</h1>
-        <p class="subtitle">Kelola license key untuk semua produk: Digiflazz Extension, WhatsApp Bot, dan Telegram Bot</p>
-        <div class="header-stats">
-          <div class="stat-item">
-            <span>📊 Total License:</span>
-            <span class="stat-value" id="total-licenses">0</span>
-          </div>
-          <div class="stat-item">
-            <span>✅ Active:</span>
-            <span class="stat-value" id="active-licenses">0</span>
-          </div>
-          <div class="stat-item">
-            <span>🆕 Unused:</span>
-            <span class="stat-value" id="unused-licenses">0</span>
-          </div>
-        </div>
+  <div class="header-content">
+    <div class="header-badge">Owner Panel</div>
+    <h1 class="main-title">Geekz License Management</h1>
+    <p class="subtitle">Kelola license key untuk semua produk: Digiflazz Extension, WhatsApp Bot, dan Telegram Bot</p>
+    <div class="header-stats">
+      <div class="stat-item">
+        <span>📊 Total License:</span>
+        <span class="stat-value" id="total-licenses">0</span>
       </div>
-      <div class="header-actions">
-        <button id="btn-logout" class="logout-btn">
-          <span>🚪</span>
-          Logout
-        </button>
+      <div class="stat-item">
+        <span>✅ Active:</span>
+        <span class="stat-value" id="active-licenses">0</span>
+      </div>
+      <div class="stat-item">
+        <span>🆕 Unused:</span>
+        <span class="stat-value" id="unused-licenses">0</span>
       </div>
     </div>
+  </div>
+  <div class="header-actions">
+    <button id="btn-logout" class="logout-btn">
+      <span>🚪</span>
+      Logout
+    </button>
+  </div>
+</div>
 
     <div class="header" id="login-header">
       <h1 class="main-title">Geekz License Owner Panel</h1>
