@@ -9,6 +9,10 @@ function setAdminKey(key) {
   if (key) localStorage.setItem("geekz_admin_key", key);
 }
 
+function clearAdminKey() {
+  localStorage.removeItem("geekz_admin_key");
+}
+
 async function apiFetch(path, options = {}) {
   const headers = options.headers || {};
   headers["Content-Type"] = "application/json";
@@ -30,6 +34,29 @@ async function apiFetch(path, options = {}) {
   }
 }
 
+function showAdminPanel() {
+  $("login-header").style.display = "none";
+  $("admin-header").style.display = "flex";
+  $("login-card").style.display = "none";
+  $("admin-card").style.display = "block";
+  $("list-card").style.display = "block";
+}
+
+function showLoginPanel() {
+  $("login-header").style.display = "block";
+  $("admin-header").style.display = "none";
+  $("login-card").style.display = "block";
+  $("admin-card").style.display = "none";
+  $("list-card").style.display = "none";
+}
+
+function logout() {
+  clearAdminKey();
+  showLoginPanel();
+  $("admin-pass").value = "";
+  $("login-msg").textContent = "Anda telah logout.";
+}
+
 async function tryLogin() {
   const pass = $("admin-pass").value.trim();
   if (!pass) {
@@ -46,14 +73,12 @@ async function tryLogin() {
 
     if (!data.ok || status !== 200) {
       $("login-msg").textContent = "Login gagal: " + (data.message || "invalid password");
-      localStorage.removeItem("geekz_admin_key");
+      clearAdminKey();
       return;
     }
 
     $("login-msg").textContent = "";
-    $("login-card").style.display = "none";
-    $("admin-card").style.display = "block";
-    $("list-card").style.display = "block";
+    showAdminPanel();
     loadLicenses();
   } catch (error) {
     console.error("Login error:", error);
@@ -197,6 +222,7 @@ function clearForm() {
 
 window.addEventListener("DOMContentLoaded", () => {
   $("btn-login").addEventListener("click", tryLogin);
+  $("btn-logout").addEventListener("click", logout);
   $("admin-pass").addEventListener("keydown", e => {
     if (e.key === "Enter") tryLogin();
   });
@@ -206,6 +232,9 @@ window.addEventListener("DOMContentLoaded", () => {
   $("btn-clear").addEventListener("click", clearForm);
 
   if (getAdminKey()) {
-    tryLogin();
+    showAdminPanel();
+    loadLicenses();
+  } else {
+    showLoginPanel();
   }
 });

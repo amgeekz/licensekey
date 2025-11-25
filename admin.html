@@ -42,9 +42,17 @@
       z-index: 1;
     }
 
-    .header {
-      text-align: center;
+    .admin-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       margin-bottom: 40px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .header-content {
+      flex: 1;
     }
 
     .main-title {
@@ -60,6 +68,23 @@
     .subtitle {
       font-size: 16px;
       color: #94a3b8;
+    }
+
+    .logout-btn {
+      background: rgba(239, 68, 68, 0.1);
+      color: #fca5a5;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .logout-btn:hover {
+      background: rgba(239, 68, 68, 0.2);
+      transform: translateY(-1px);
     }
 
     .card {
@@ -282,12 +307,22 @@
 </head>
 <body>
   <div class="container">
-    <div class="header">
+    <div class="admin-header" id="admin-header" style="display:none;">
+      <div class="header-content">
+        <h1 class="main-title">Geekz License Owner Panel</h1>
+        <p class="subtitle">Kelola license key untuk sistem Digiflazz Auto Update</p>
+      </div>
+      <button id="btn-logout" class="logout-btn">
+        <span>🚪</span>
+        Logout
+      </button>
+    </div>
+
+    <div class="header" id="login-header">
       <h1 class="main-title">Geekz License Owner Panel</h1>
       <p class="subtitle">Kelola license key untuk sistem Digiflazz Auto Update</p>
     </div>
 
-    <!-- Login Card -->
     <div class="card" id="login-card">
       <h2 class="card-title">🔐 Owner Authentication</h2>
       <p class="card-subtitle">Masukkan password owner untuk mengakses panel management</p>
@@ -297,7 +332,6 @@
           id="admin-pass" 
           type="password" 
           placeholder="Masukkan password owner..." 
-          class="full" 
         />
       </div>
       
@@ -311,50 +345,46 @@
       <div id="login-msg" class="message"></div>
     </div>
 
-    <!-- Management Card -->
     <div class="card" id="admin-card" style="display:none;">
-  <h2 class="card-title">📦 License Management</h2>
-  <p class="card-subtitle">
-    Kelola license key untuk semua produk: Digiflazz Extension, WhatsApp Bot, dan Telegram Bot
-  </p>
+      <h2 class="card-title">📦 License Management</h2>
+      <p class="card-subtitle">
+        Kelola license key untuk semua produk: Digiflazz Extension, WhatsApp Bot, dan Telegram Bot
+      </p>
 
-  <div class="form-group">
-    <input 
-      id="f-licenseKey" 
-      class="full" 
-      placeholder="License Key (format: GEEKZ-XXXX-XXXX)" 
-    />
-  </div>
-  
-  <div class="form-group">
-    <input 
-      id="f-ownerEmail" 
-      class="full" 
-      placeholder="Email Pemilik (opsional)" 
-    />
-  </div>
-  
-  <div class="form-group">
-    <div class="flex items-center flex-wrap" style="gap: 12px;">
-      <span class="small">Status Overall:</span>
-      <select id="f-status">
-        <option value="unused">🆕 Unused</option>
-        <option value="active">✅ Active</option>
-        <option value="disabled">❌ Disabled</option>
-      </select>
+      <div class="form-group">
+        <input 
+          id="f-licenseKey" 
+          placeholder="License Key (format: GEEKZ-XXXX-XXXX)" 
+        />
+      </div>
+      
+      <div class="form-group">
+        <input 
+          id="f-ownerEmail" 
+          placeholder="Email Pemilik (opsional)" 
+        />
+      </div>
+      
+      <div class="form-group">
+        <div class="flex items-center flex-wrap" style="gap: 12px;">
+          <span class="small">Status Overall:</span>
+          <select id="f-status">
+            <option value="unused">🆕 Unused</option>
+            <option value="active">✅ Active</option>
+            <option value="disabled">❌ Disabled</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="flex justify-end flex-wrap" style="gap: 12px;">
+        <button id="btn-clear" class="btn btn-ghost">Clear Form</button>
+        <button id="btn-save" class="btn btn-primary">Simpan / Update</button>
+        <button id="btn-delete" class="btn btn-danger">Hapus License</button>
+      </div>
+
+      <div id="admin-msg" class="message"></div>
     </div>
-  </div>
 
-  <div class="flex justify-end flex-wrap" style="gap: 12px;">
-    <button id="btn-clear" class="btn btn-ghost">Clear Form</button>
-    <button id="btn-save" class="btn btn-primary">Simpan / Update</button>
-    <button id="btn-delete" class="btn btn-danger">Hapus License</button>
-  </div>
-
-  <div id="admin-msg" class="message"></div>
-</div>
-
-    <!-- License List Card -->
     <div class="card" id="list-card" style="display:none;">
       <h2 class="card-title">📋 Daftar License Key</h2>
       <p class="card-subtitle">Klik pada baris license untuk memuat data ke form editing</p>
