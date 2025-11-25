@@ -67,11 +67,29 @@ function renderLicenses(items) {
   items.forEach(it => {
     const tr = document.createElement("tr");
     tr.style.cursor = "pointer";
+    
+    const deviceInfo = [];
+    const products = ['digiflazz', 'whatsapp', 'telegram'];
+    const icons = {'digiflazz': '🔧', 'whatsapp': '💬', 'telegram': '📱'};
+    
+    products.forEach(product => {
+      const prod = it.products?.[product];
+      if (prod?.deviceId) {
+        deviceInfo.push(
+          `${icons[product]} ${product.charAt(0).toUpperCase() + product.slice(1)}: ${prod.deviceName || ''}<br><span class="small">${prod.deviceId}</span>`
+        );
+      }
+    });
+    
+    const deviceDisplay = deviceInfo.length > 0 
+      ? deviceInfo.join('<br><br>')
+      : "<span class='small'>-</span>";
+
     tr.innerHTML = `
       <td>${it.licenseKey}</td>
       <td>${it.ownerEmail || "-"}</td>
       <td class="${it.status === "active" ? "status-active" : it.status === "unused" ? "status-unused" : "status-other"}">${it.status}</td>
-      <td>${it.deviceId ? `${it.deviceName || ""}<br><span class="small">${it.deviceId}</span>` : "<span class='small'>-</span>"}</td>
+      <td>${deviceDisplay}</td>
       <td>
         <span class="small">Aktif: ${it.firstActivated ? new Date(it.firstActivated).toLocaleString("id-ID") : "-"}</span><br>
         <span class="small">Last: ${it.lastCheckin ? new Date(it.lastCheckin).toLocaleString("id-ID") : "-"}</span>
