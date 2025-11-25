@@ -1,4 +1,5 @@
 import checkAdmin from './_checkAdmin.js';
+import jwt from 'jsonwebtoken';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -16,8 +17,18 @@ export default async function handler(req, res) {
     });
   }
 
+  const token = jwt.sign(
+    { 
+      role: 'admin',
+      timestamp: Date.now()
+    },
+    process.env.JWT_SECRET,
+    { expiresIn: '24h' }
+  );
+
   return res.status(200).json({ 
     ok: true, 
-    message: 'Login berhasil' 
+    message: 'Login berhasil',
+    token: token
   });
 }
