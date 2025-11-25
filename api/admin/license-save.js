@@ -25,14 +25,28 @@ export default async function handler(req, res) {
 
       if (status === 'unused') {
         payload.products = {
-          digiflazz: { status: 'unused' },
-          whatsapp: { status: 'unused' },
-          telegram: { status: 'unused' }
+          digiflazz: { 
+            status: 'unused',
+            deviceId: null,
+            deviceName: null,
+            firstActivated: null,
+            lastCheckin: null
+          },
+          whatsapp: { 
+            status: 'unused',
+            deviceId: null,
+            deviceName: null,
+            firstActivated: null,
+            lastCheckin: null
+          },
+          telegram: { 
+            status: 'unused',
+            deviceId: null,
+            deviceName: null,
+            firstActivated: null,
+            lastCheckin: null
+          }
         };
-        payload.deviceId = null;
-        payload.deviceName = null;
-        payload.firstActivated = null;
-        payload.lastCheckin = null;
       }
 
       await docRef.set(payload, { merge: true });
