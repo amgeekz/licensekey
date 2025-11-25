@@ -15,13 +15,42 @@ export default async function handler(req, res) {
       }
 
       const docRef = db.collection('licenses').doc(licenseKey);
+      const existingDoc = await docRef.get();
+      const existingData = existingDoc.exists ? existingDoc.data() : {};
+
+      let products = existingData.products || {};
+      
+      if (status === 'unused') {
+        products = {
+          digiflazz: { status: 'unused' },
+          whatsapp: { status: 'unused' },
+          telegram: { status: 'unused' }
+        };
+      } else if (status === 'disabled') {
+        Object.keys(products).forEach(product => {
+          if (products[product]) {
+            products[product].status = 'disabled';
+          }
+        });
+      }
 
       const payload = {
         licenseKey,
         ownerEmail: ownerEmail || '',
         status: status || 'unused',
+        products: products,
         updatedAt: new Date()
       };
+
+      if (existingData.deviceId && !products.digiflazz?.deviceId) {
+        payload.products.digiflazz = {
+          status: status === 'unused' ? 'unused' : 'active',
+          deviceId: existingData.deviceId,
+          deviceName: existingData.deviceName || '',
+          firstActivated: existingData.firstActivated,
+          lastCheckin: existingData.lastCheckin
+        };
+      }
 
       await docRef.set(payload, { merge: true });
 
