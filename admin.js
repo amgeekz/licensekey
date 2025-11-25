@@ -67,26 +67,38 @@ function renderLicenses(items) {
   items.forEach(it => {
     const tr = document.createElement("tr");
     tr.style.cursor = "pointer";
-    const devices = [];
     
-    if (it.products?.digiflazz?.deviceId) {
-      const digiflazz = it.products.digiflazz;
-      devices.push(`🔧 Digiflazz: ${digiflazz.deviceName || ''}<br><span class="small">${digiflazz.deviceId}</span>`);
+    console.log('License data:', it);
+    
+    const deviceInfo = [];
+    
+    if (it.products) {
+      if (it.products.digiflazz?.deviceId) {
+        const digiflazz = it.products.digiflazz;
+        deviceInfo.push(`🔧 Digiflazz: ${digiflazz.deviceName || ''}<br><span class="small">${digiflazz.deviceId}</span>`);
+      }
+      
+      if (it.products.whatsapp?.deviceId) {
+        const whatsapp = it.products.whatsapp;
+        deviceInfo.push(`💬 WhatsApp: ${whatsapp.deviceName || ''}<br><span class="small">${whatsapp.deviceId}</span>`);
+      }
+      
+      if (it.products.telegram?.deviceId) {
+        const telegram = it.products.telegram;
+        deviceInfo.push(`📱 Telegram: ${telegram.deviceName || ''}<br><span class="small">${telegram.deviceId}</span>`);
+      }
     }
     
-    if (it.products?.whatsapp?.deviceId) {
-      const whatsapp = it.products.whatsapp;
-      devices.push(`💬 WhatsApp: ${whatsapp.deviceName || ''}<br><span class="small">${whatsapp.deviceId}</span>`);
-    }
-   
-    if (it.products?.telegram?.deviceId) {
-      const telegram = it.products.telegram;
-      devices.push(`📱 Telegram: ${telegram.deviceName || ''}<br><span class="small">${telegram.deviceId}</span>`);
+    if (deviceInfo.length === 0 && it.deviceId) {
+      deviceInfo.push(`🔧 Digiflazz: ${it.deviceName || ''}<br><span class="small">${it.deviceId}</span>`);
     }
     
-    const deviceDisplay = devices.length > 0 
-      ? devices.join('<br><br>')
+    const deviceDisplay = deviceInfo.length > 0 
+      ? deviceInfo.join('<br><br>')
       : "<span class='small'>-</span>";
+
+    const firstActivated = it.firstActivated || (it.products?.digiflazz?.firstActivated);
+    const lastCheckin = it.lastCheckin || (it.products?.digiflazz?.lastCheckin);
 
     tr.innerHTML = `
       <td>${it.licenseKey}</td>
@@ -94,10 +106,11 @@ function renderLicenses(items) {
       <td class="${it.status === "active" ? "status-active" : it.status === "unused" ? "status-unused" : "status-other"}">${it.status}</td>
       <td>${deviceDisplay}</td>
       <td>
-        <span class="small">Aktif: ${it.firstActivated ? new Date(it.firstActivated).toLocaleString("id-ID") : "-"}</span><br>
-        <span class="small">Last: ${it.lastCheckin ? new Date(it.lastCheckin).toLocaleString("id-ID") : "-"}</span>
+        <span class="small">Aktif: ${firstActivated ? new Date(firstActivated).toLocaleString("id-ID") : "-"}</span><br>
+        <span class="small">Last: ${lastCheckin ? new Date(lastCheckin).toLocaleString("id-ID") : "-"}</span>
       </td>
     `;
+    
     tr.addEventListener("click", () => {
       $("f-licenseKey").value = it.licenseKey;
       $("f-ownerEmail").value = it.ownerEmail || "";
@@ -111,10 +124,15 @@ function renderLicenses(items) {
 async function loadLicenses() {
   $("admin-msg").textContent = "Memuat daftar license...";
   const { status, data } = await apiFetch("/api/admin/licenses-list");
+  
+  console.log('API Response:', { status, data });
+  
   if (!data.ok || status !== 200) {
     $("admin-msg").textContent = "Gagal load license: " + (data.message || "Unknown error");
     return;
   }
+  
+  console.log('Licenses data:', data.items);
   $("admin-msg").textContent = "";
   renderLicenses(data.items || []);
 }
