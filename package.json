@@ -1,13 +1,14 @@
 {
-  "name": "geekz-license-server",
+  "name": "geekz-license-api",
   "version": "1.0.0",
-  "private": true,
+  "description": "License API Geekz Code",
   "type": "module",
   "scripts": {
     "dev": "vercel dev",
-    "start": "vercel dev"
+    "start": "node server.js"
   },
   "dependencies": {
+    "jsonwebtoken": "^9.0.2",
     "firebase-admin": "^12.0.0"
   }
 }

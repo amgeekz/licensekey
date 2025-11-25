@@ -1,23 +1,24 @@
 const $ = id => document.getElementById(id);
 const API_BASE = "https://license.amgeekz.my.id/";
 
-function getAdminKey() {
-  return localStorage.getItem("geekz_admin_key") || "";
+function getAdminToken() {
+  return localStorage.getItem("geekz_admin_token") || "";
 }
 
-function setAdminKey(key) {
-  if (key) localStorage.setItem("geekz_admin_key", key);
+function setAdminToken(token) {
+  if (token) localStorage.setItem("geekz_admin_token", token);
 }
 
-function clearAdminKey() {
-  localStorage.removeItem("geekz_admin_key");
+function clearAdminToken() {
+  localStorage.removeItem("geekz_admin_token");
 }
 
 async function apiFetch(path, options = {}) {
   const headers = options.headers || {};
   headers["Content-Type"] = "application/json";
-  const adminKey = getAdminKey();
-  if (adminKey) headers["X-Admin-Key"] = adminKey;
+  
+  const token = getAdminToken();
+  if (token) headers["X-Admin-Token"] = token;
 
   try {
     const res = await fetch(API_BASE + path, {
@@ -25,6 +26,12 @@ async function apiFetch(path, options = {}) {
       headers,
       body: options.body ? JSON.stringify(options.body) : undefined
     });
+
+    if (res.status === 401) {
+      clearAdminToken();
+      showLoginPanel();
+      throw new Error('Session expired');
+    }
 
     const data = await res.json().catch(() => ({}));
     return { status: res.status, data };
@@ -51,7 +58,7 @@ function showLoginPanel() {
 }
 
 function logout() {
-  clearAdminKey();
+  clearAdminToken();
   showLoginPanel();
   $("admin-pass").value = "";
   $("login-msg").textContent = "Anda telah logout.";
@@ -63,23 +70,28 @@ async function tryLogin() {
     $("login-msg").textContent = "Isi password terlebih dahulu.";
     return;
   }
-  setAdminKey(pass);
 
   try {
-    const { status, data } = await apiFetch("/api/admin/login", {
-      method: "POST",
-      body: {}
+    const response = await fetch(API_BASE + '/api/admin/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Admin-Key': pass
+      }
     });
 
-    if (!data.ok || status !== 200) {
-      $("login-msg").textContent = "Login gagal: " + (data.message || "invalid password");
-      clearAdminKey();
+    const data = await response.json();
+    
+    if (!data.ok) {
+      $("login-msg").textContent = data.message || "Login gagal";
       return;
     }
 
+    setAdminToken(data.token);
     $("login-msg").textContent = "";
     showAdminPanel();
     loadLicenses();
+    
   } catch (error) {
     console.error("Login error:", error);
     $("login-msg").textContent = "Error: " + error.message;
@@ -244,7 +256,7 @@ window.addEventListener("DOMContentLoaded", () => {
   $("btn-delete").addEventListener("click", deleteLicense);
   $("btn-clear").addEventListener("click", clearForm);
 
-  if (getAdminKey()) {
+  if (getAdminToken()) {
     showAdminPanel();
     loadLicenses();
   } else {
