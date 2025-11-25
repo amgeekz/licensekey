@@ -156,6 +156,10 @@
       background: transparent;
       color: #94a3b8;
       border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 10px 16px;
+      font-size: 12px;
+      white-space: nowrap;
+      flex-shrink: 0;
     }
 
     .btn-ghost:hover {
@@ -166,6 +170,7 @@
     .flex {
       display: flex;
       gap: 12px;
+      flex-wrap: wrap;
     }
 
     .justify-end {
@@ -287,50 +292,50 @@
     </div>
 
     <div id="lic-info" class="license-info">
-  <div class="info-grid">
-    <div class="info-item">
-      <span class="info-label">Status License</span>
-      <span class="info-value" id="lic-status">-</span>
+      <div class="info-grid">
+        <div class="info-item">
+          <span class="info-label">Status License</span>
+          <span class="info-value" id="lic-status">-</span>
+        </div>
+        
+        <div class="info-item">
+          <span class="info-label">🔧 Digiflazz Extension</span>
+          <span class="info-value" id="product-digiflazz">-</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">💬 WhatsApp Bot</span>
+          <span class="info-value" id="product-whatsapp">-</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">📱 Telegram Bot</span>
+          <span class="info-value" id="product-telegram">-</span>
+        </div>
+        
+        <div class="info-item">
+          <span class="info-label">Aktif Sejak</span>
+          <span class="info-value" id="lic-first">-</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Terakhir Digunakan</span>
+          <span class="info-value" id="lic-last">-</span>
+        </div>
+      </div>
+      
+      <div class="flex justify-end" style="margin-top: 20px; gap: 12px;">
+        <button id="btn-release-digiflazz" class="btn btn-ghost" style="display: none;">
+          <span>🔓</span>
+          Lepaskan Digiflazz
+        </button>
+        <button id="btn-release-whatsapp" class="btn btn-ghost" style="display: none;">
+          <span>🔓</span>
+          Lepaskan WhatsApp
+        </button>
+        <button id="btn-release-telegram" class="btn btn-ghost" style="display: none;">
+          <span>🔓</span>
+          Lepaskan Telegram
+        </button>
+      </div>
     </div>
-    
-    <div class="info-item">
-      <span class="info-label">🔧 Digiflazz Extension</span>
-      <span class="info-value" id="product-digiflazz">-</span>
-    </div>
-    <div class="info-item">
-      <span class="info-label">💬 WhatsApp Bot</span>
-      <span class="info-value" id="product-whatsapp">-</span>
-    </div>
-    <div class="info-item">
-      <span class="info-label">📱 Telegram Bot</span>
-      <span class="info-value" id="product-telegram">-</span>
-    </div>
-    
-    <div class="info-item">
-      <span class="info-label">Aktif Sejak</span>
-      <span class="info-value" id="lic-first">-</span>
-    </div>
-    <div class="info-item">
-      <span class="info-label">Terakhir Digunakan</span>
-      <span class="info-value" id="lic-last">-</span>
-    </div>
-  </div>
-  
-  <div class="flex justify-end" style="margin-top: 20px; gap: 12px;">
-    <button id="btn-release-digiflazz" class="btn btn-ghost" style="display: none;">
-      <span>🔓</span>
-      Lepaskan Digiflazz
-    </button>
-    <button id="btn-release-whatsapp" class="btn btn-ghost" style="display: none;">
-      <span>🔓</span>
-      Lepaskan WhatsApp
-    </button>
-    <button id="btn-release-telegram" class="btn btn-ghost" style="display: none;">
-      <span>🔓</span>
-      Lepaskan Telegram
-    </button>
-  </div>
-</div>
 
     <div id="msg" class="message"></div>
 
