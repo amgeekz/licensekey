@@ -24,11 +24,7 @@ export default async function handler(req, res) {
       };
 
       if (status === 'unused') {
-        payload.products = {
-          digiflazz: { status: 'unused' },
-          whatsapp: { status: 'unused' },
-          telegram: { status: 'unused' }
-        };
+        payload.products = null;
       }
 
       await docRef.set(payload, { merge: true });
