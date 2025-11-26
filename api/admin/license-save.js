@@ -25,27 +25,9 @@ export default async function handler(req, res) {
 
       if (status === 'unused') {
         payload.products = {
-          digiflazz: { 
-            status: 'unused',
-            deviceId: null,
-            deviceName: null,
-            firstActivated: null,
-            lastCheckin: null
-          },
-          whatsapp: { 
-            status: 'unused',
-            deviceId: null,
-            deviceName: null,
-            firstActivated: null,
-            lastCheckin: null
-          },
-          telegram: { 
-            status: 'unused',
-            deviceId: null,
-            deviceName: null,
-            firstActivated: null,
-            lastCheckin: null
-          }
+          digiflazz: { status: 'unused' },
+          whatsapp: { status: 'unused' },
+          telegram: { status: 'unused' }
         };
       }
 
