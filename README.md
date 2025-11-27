@@ -1,9 +1,3 @@
-# LicenseKey
-
-**LicenseKey** adalah aplikasi web yang membantu Anda membuat, memvalidasi, dan mengelola kunci lisensi dengan mudah dan cepat. Cocok digunakan untuk developer atau bisnis yang ingin menjalankan sistem aktivasi produk digital berbasis web.
-
-🌎 [Demo Aplikasi](https://license.amgeekz.my.id)
-
 ## Fitur Unggulan 🚀
 
 - **Generate License Key:** Buat kunci lisensi unik untuk produk Anda.
